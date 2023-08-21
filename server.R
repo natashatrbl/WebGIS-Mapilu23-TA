@@ -27,6 +27,7 @@ function(input, output, session) {
   
   ######################## MENU DEMOGRAFI #################################
   
+  ################ Viewport pertama ##################
   #value box persentase perempuan per kecamatan
   output$persen_perempuan <- renderValueBox({
     selected_kecamatan <- input$kecamatan
@@ -55,8 +56,7 @@ function(input, output, session) {
     )
   })
   
-  #filtering the data by kecamatan 
-  #and plotting the barplot using ggplotly
+  #filtering the data by kecamatan and plotting the barplot using ggplotly
   #data_hasil filtered by kecamatan
   datahasil_filteredby_kec <- reactive(
     data_hasil %>% filter(KECAMATAN == input$kecamatan)
@@ -122,9 +122,9 @@ function(input, output, session) {
     ggplotly(p, tooltip = c("count"))
   })
 
+  ################ viewport kedua ###################
   #Map rendering logic
   #action button to show the map
-  
   observeEvent(input$showmap_button, {
   
   #plotting the geografi map using ggplot2
@@ -163,8 +163,77 @@ function(input, output, session) {
 
   ######################## MENU ELECTORAL VOTE ###################################
   
+  ################ viewport pertama #################
+  #valueboxoutput rerata tingkat partisipasi per kecamatan
+  output$partisipatif_mean <- renderValueBox({
+    kecamatan_pilihan <- input$kecamatan_elect
+    filtered_kecamatan <- data_hasil[data_hasil$KECAMATAN == kecamatan_pilihan, ]
+    mean_partisipatif <- mean(filtered_kecamatan$SKOR_TOTAL)
+    mean_partisipatif_round <- round(mean_partisipatif, 2)
+    
+    valueBox(value = mean_partisipatif_round,
+             subtitle = paste0("Rerata Skor Tingkat Partisipasi Politik di ", input$kecamatan_elect),
+             width = "100%",
+             color = "olive"
+             )
+  })
   
+  #valueboxoutput persentase parpol legislatif per kecamatan
+  output$parpolleg_persentase <- renderValueBox({
+    kecamatan_pilihan <- input$kecamatan_elect
+    persen_parpolleg_round <- round(sum(data_hasil$PARTAI_LEGISLATIF == "PDIP" &
+                                     data_hasil$KECAMATAN == kecamatan_pilihan)/
+                                 sum(data_hasil$KECAMATAN == kecamatan_pilihan)* 100, 2)
+    
+    valueBox(value = paste0(persen_parpolleg_round, "%"),
+             subtitle = paste0("Persentase Dominasi Partai PDIP di ", input$kecamatan_elect),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  
+  #valueboxoutput persentase calon presiden per kecamatan
+  output$capres_persentase <- renderValueBox({
+    kecamatan_pilihan <- input$kecamatan_elect
+    persen_capres_round <- round(sum(data_hasil$CAPRES == "Ganjar Pranowo" &
+                                          data_hasil$KECAMATAN == kecamatan_pilihan)/
+                                      sum(data_hasil$KECAMATAN == kecamatan_pilihan)* 100, 2)
+    
+    valueBox(value = paste0(persen_capres_round, "%"),
+             subtitle = paste0("Persentase Dominasi Ganjar Pranowo di ", input$kecamatan_elect),
+             width = "100%",
+             color = "black"
+    )
+  })
+  
+  #rendering plot output for each parameters that will be shown as bar chart
+  #filtering data by kecamatan
+  elect_filteredby_kec <- reactive(
+    data_hasil %>% filter(KECAMATAN == input$kecamatan_elect)
+  ) 
+  #barplot kecamatan by parpol legislatif
+  output$barplot_kecby_parpolleg <- renderPlotly({
+    p <- ggplot(data = elect_filteredby_kec())+
+      geom_bar(aes(x = str_wrap(PARTAI_LEGISLATIF, width = 7)), stat = "count", fill = "#2FB380")+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = paste("Dominasi Partai Politik Legislatif di", input$kecamatan_elect), x = "Partai Politik Legislatif", y = "Count")
+    
+    #Create plotly plot from ggplot object
+    ggplotly(p, tooltip = c("count"))
+  })
  
+  #barplot kecamatan by nama capres
+  output$barplot_kecby_capres <- renderPlotly({
+    p <- ggplot(data = elect_filteredby_kec())+
+      geom_bar(aes(x = str_wrap(CAPRES, width = 10)), stat = "count", fill = "#141414")+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = paste("Dominasi Capres di", input$kecamatan_elect), x = "Nama Capres", y = "Count")
+    
+    #Create plotly plot from ggplot object
+    ggplotly(p, tooltip = c("count"))
+  })
   
 }
 

@@ -12,16 +12,24 @@ library(tidyverse)
 library(sf)
 library(mapdeck)
 
-
+#data skoring hasil survei
 data_hasil <- read.csv("data/hasil_survei.csv")
 
+
+#data geojson untuk main map
 pituruh <- sf::st_read("data/Pituruh.geojson")
 
+
+#data untuk demografi map
 kependudukan_pwr <- sf::st_read("data/kependudukan_withmap.shp")
 
 geografi_pwr <- sf::st_read("data/geografi_withmap.shp")
 
 partisipasi_pwr <- sf::st_read("data/tingkatpartisipasi_withmap.shp")
+
+
+#data untuk electoral map
+
 
 shinyApp(ui, server)
 
