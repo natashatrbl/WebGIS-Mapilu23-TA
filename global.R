@@ -4,6 +4,7 @@
 library(shiny)
 library(shinydashboard)
 library(dashboardthemes)
+library(DT)
 library(dplyr)
 library(stringr)
 library(ggplot2)
@@ -29,7 +30,7 @@ partisipasi_pwr <- sf::st_read("data/tingkatpartisipasi_withmap.shp")
 
 
 #data untuk electoral map
-
+electoral_pwr <- sf::st_read("data/electoral_avgwithmap.shp")
 
 shinyApp(ui, server)
 

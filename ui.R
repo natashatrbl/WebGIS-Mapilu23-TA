@@ -183,6 +183,7 @@ dashboardPage(
               ),
               #main panel
                 mainPanel(
+                  width = 9,
                   fluidRow(
                     column(7,
                            plotlyOutput("barplot_kecby_parpolleg")),
@@ -228,10 +229,10 @@ dashboardPage(
               #main Panel tampilan map detail per kecamatan berdasarkan slider dan matching rows 
               mainPanel(
                   width = 9,
-                    column(6,
-                          plotOutput("kelaspartisipasi_map")),
-                    column(6,
-                          plotOutput("presiden_map"))
+                    column(7,
+                          plotOutput("presiden_map")),
+                    column(5,
+                           tableOutput("presiden_table"))
                 )
               ),
             

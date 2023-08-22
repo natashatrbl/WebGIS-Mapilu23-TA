@@ -235,6 +235,39 @@ function(input, output, session) {
     ggplotly(p, tooltip = c("count"))
   })
   
+  ################ viewport kedua #################
+  #rendering map and table for slider input view
+  output$presiden_map <- renderPlot({
+    #the score input
+    score_pres <- as.numeric(input$skor_capres) 
+    
+    #convert skala pres to numeric
+    electoral_pwr$SK_PRESAVG <- as.numeric(electoral_pwr$SK_PRESAVG)
+    
+    #filtering the shapefile data based on the slider input score
+    filtered_score_pres <- electoral_pwr %>%
+      filter(is.na(SK_PRESAVG) & SK_PRESAVG >= score_pres)
+
+    #best matching between the kecamatan and mean score closest into the input score
+    best_pressby_kec <- mean_press_score %>%
+      slice(which.min(abs(mean_score - mean_press_score)))
+    
+    #Filter the original data to get polygons for the best-matching kecamatan
+    best_presbykec_data <- electoral_pwr %>%
+      filter(kecamatan == best_presby_kec$kecamatan)
+    
+    #printing the map
+    ggplot()+
+      geom_sf(data = best_presbykec_data) +
+    theme_minimal() +
+    theme(panel.grid = element_blank()) +
+    labs(paste(title = "Kecamatan dengan Dominasi Skala Presiden", input$skor_capres))
+  })
+  
+  output$presiden_table <- renderDataTable({
+    
+  })
+  
 }
 
 
