@@ -22,15 +22,16 @@ pituruh <- sf::st_read("data/Pituruh.geojson")
 
 
 #data untuk demografi map
-kependudukan_pwr <- sf::st_read("data/kependudukan_withmap.shp")
-
-geografi_pwr <- sf::st_read("data/geografi_withmap.shp")
+demografi_pwr <- sf::st_read("data/demografi_map.shp")
 
 partisipasi_pwr <- sf::st_read("data/tingkatpartisipasi_withmap.shp")
 
 
 #data untuk electoral map
-electoral_pwr <- sf::st_read("data/electoral_avgwithmap.shp")
+electoral_csv <- read.csv("data/electoral_avg.csv")
+
+electoral_pwr <- sf::st_read("data/electoral_map3.shp")
+
 
 shinyApp(ui, server)
 

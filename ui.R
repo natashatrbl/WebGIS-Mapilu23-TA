@@ -204,34 +204,32 @@ dashboardPage(
                 collapsible = T,
                 div(
                   style = "color: white; padding: 2rem; font-size: 15px",
-                  "Saatnya bermain dengan angka! Anda dapat menggeser slider pada sidebar untuk mengetahui kecamatan mana yang paling cocok dengan skala calon presiden yang anda pilih. Keterangan skala calon dapat dilihat di bawah slider.")
+                  "Saatnya melihat dominasi masing-masing capres di setiap kecamatan. Anda dapat memilih salah satu nama calon untuk mengetahui bagaimana visualisasi dominasi atau persentase pemilih di masing-masing kecamatan dari yang paling tinggi hingga ke paling rendah")
               ),
               #sidebar panel
               sidebarPanel(
                 width = 3,
-                #slider input sliding likert skala presiden
-                sliderInput("skor_capres", "Slide skala untuk capres",
-                            min = 0,
-                            max = 100,
-                            value = 0,
-                            ticks = TRUE),
+                #select input dominasi capres
+                selectInput("capres_selector", "Pilih Kandidat Capres",
+                            choices = c("Ganjar Pranowo", "Prabowo Subianto", "Anies Baswedan", "Lainnya", "Belum Menentukan Pilihan")
+                ),
                 box(
-                  title = "Keterangan Skala",
+                  title = "Visualisasi Spasial Capres",
                   status = "primary",
                   background = "navy",
                   width = "100%",
                   collapsible = F,
                   div(
                     style = "color: white; padding: 1rem",
-                    "Ganjar Pranowo = 100, Prabowo Subianto = 75, Anies Baswedan = 50, Lainnya = 25, Belum Menentukan Pilihan = 0")
+                    "Silahkan memilih salah satu nama calon presiden, maka anda akan melihat peta visualisasi dominasi setiap nama calon berdasarkan kecamatan")
                 )
                       ),
               #main Panel tampilan map detail per kecamatan berdasarkan slider dan matching rows 
               mainPanel(
                   width = 9,
-                    column(7,
+                    column(8,
                           plotOutput("presiden_map")),
-                    column(5,
+                    column(4,
                            tableOutput("presiden_table"))
                 )
               ),
@@ -251,15 +249,26 @@ dashboardPage(
               ),
               #sidebar panel checkboxgroup dan action button
               sidebarPanel(
-                width = 3,
-                #checkbox group untuk opsi peta
-                checkboxGroupInput(
-                  "electoralmap_checkbox", "Pilih peta yang ingin ditampilkan",
-                  choices = c("Kependudukan", "Geografis", "Tingkat Partisipasi", "Partai Politik Legislatif", "Partai Politik Presiden", "Calon Presiden"),
-                  selected = c("Tingkat Partisipasi", "Calon Presiden")
-                ),
-                #action button untuk menampilkan peta
-                actionButton("electoralmap_button", "Tampilkan Peta")
+                  width = 3,
+                  #checkbox group untuk opsi peta
+                  checkboxGroupInput(
+                    "electoralmap_checkbox", "Pilih partai yang ingin ditampilkan",
+                    choices = c("PDIP", "Gerindra", "Nasdem", "Demokrat", "Golkar", "Perindo", "PAN"),
+                    selected = c("PDIP", "Gerindra")
+                  ),
+                  #box keterangan
+                  box(
+                    title = "Visualisasi Spasial Capres",
+                    status = "primary",
+                    background = "navy",
+                    width = "100%",
+                    collapsible = F,
+                    div(
+                      style = "color: white; padding: 1rem",
+                      "Silahkan memilih salah satu nama calon presiden, maka anda akan melihat peta visualisasi dominasi setiap nama calon berdasarkan kecamatan")
+                  ),
+                  #action button untuk menampilkan peta
+                  actionButton("electoralmap_button", "Tampilkan Peta")
               ),
               #main panel plot peta
               mainPanel(

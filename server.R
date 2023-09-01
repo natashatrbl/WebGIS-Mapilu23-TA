@@ -132,7 +132,7 @@ function(input, output, session) {
     #plotting the demography map using ggplot2
     output$demografi_map <- renderPlot({
       ggplot()+
-        geom_sf(data = kependudukan_pwr,
+        geom_sf(data = demografi_pwr,
                 aes(fill = POPULASI))+
         theme_minimal()+
         theme(panel.grid = element_blank())+
@@ -142,8 +142,8 @@ function(input, output, session) {
     #plotting the kependudukan map using ggplot2
     output$demografi_map <- renderPlot({
       ggplot()+
-        geom_sf(data = geografi_pwr,
-                aes(fill = Jarak_Kab))+
+        geom_sf(data = demografi_pwr,
+                aes(fill = JARAK_KAB))+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jarak ke Pusat Kabupaten Per Kecamatan")
@@ -237,36 +237,106 @@ function(input, output, session) {
   
   ################ viewport kedua #################
   #rendering map and table for slider input view
+  elected_data <- electoral_pwr %>%
+    select(kode_dagri, geometry, GP_PCT, PS_PCT, AB_PCT, LAIN_PCT, NA_PCT)
+  
+  observe({
+  #filtering select input
+  selected_capres <- input$capres_selector
+  
+  #creating a column list connected with the selectInput
+  column_name <- switch(selected_capres,
+                  "Ganjar Pranowo" = "GP_PCT",
+                  "Prabowo Subianto" = "PS_PCT",
+                  "Anies Baswedan" = "AB_PCT",
+                  "Lainnya" = "LAIN_PCT",
+                  "Belum Menentukan Pilihan" = "NA_PCT"
+           )
+  
+  #plotting the map
   output$presiden_map <- renderPlot({
-    #the score input
-    score_pres <- as.numeric(input$skor_capres) 
-    
-    #convert skala pres to numeric
-    electoral_pwr$SK_PRESAVG <- as.numeric(electoral_pwr$SK_PRESAVG)
-    
-    #filtering the shapefile data based on the slider input score
-    filtered_score_pres <- electoral_pwr %>%
-      filter(is.na(SK_PRESAVG) & SK_PRESAVG >= score_pres)
-
-    #best matching between the kecamatan and mean score closest into the input score
-    best_pressby_kec <- mean_press_score %>%
-      slice(which.min(abs(mean_score - mean_press_score)))
-    
-    #Filter the original data to get polygons for the best-matching kecamatan
-    best_presbykec_data <- electoral_pwr %>%
-      filter(kecamatan == best_presby_kec$kecamatan)
-    
-    #printing the map
     ggplot()+
-      geom_sf(data = best_presbykec_data) +
-    theme_minimal() +
-    theme(panel.grid = element_blank()) +
-    labs(paste(title = "Kecamatan dengan Dominasi Skala Presiden", input$skor_capres))
+      geom_sf(data = elected_data, aes(fill = .data[[column_name]]))+
+      scale_fill_gradient(name = selected_capres)+
+      labs(fill = selected_capres)+
+      theme_minimal()
+    
+    })
+  })
+    
+  #selecting the data for the table
+  selected_capres_data <- reactive({
+    capres <- input$capres_selector
+    if (capres == "Ganjar Pranowo") {
+      electoral_csv %>%
+        filter(!is.na(GP_PCT)) %>%
+        select(Kecamatan, GP_PCT, GP_JML, JML_RESP) %>%
+        rename(Persen = GP_PCT, Jumlah = GP_JML, Responden = JML_RESP)
+    } else if (capres == "Prabowo Subianto") {
+      electoral_csv %>%
+        filter(!is.na(PS_PCT)) %>%
+        select(Kecamatan, PS_PCT, PS_JML, JML_RESP) %>%
+        rename(Persen = PS_PCT, Jumlah = PS_JML, Responden = JML_RESP)
+    } else if (capres == "Anies Baswedan") {
+      electoral_csv %>%
+        filter(!is.na(AB_PCT)) %>%
+        select(Kecamatan, AB_PCT, AB_JML, JML_RESP) %>%
+        rename(Persen = AB_PCT, Jumlah = AB_JML, Responden = JML_RESP)
+    } else if (capres == "Lainnya") {
+      electoral_csv %>%
+        filter(!is.na(LAIN_PCT)) %>%
+        select(Kecamatan, LAIN_PCT, LAIN_JML, JML_RESP) %>%
+        rename(Persen = LAIN_PCT, Jumlah = LAIN_JML, Responden = JML_RESP)
+    } else if (capres == "Belum Menentukan Pilihan") {
+      electoral_csv %>%
+        filter(!is.na(NA_PCT)) %>%
+        select(Kecamatan, NA_PCT, NA_JML, JML_RESP, Responden = JML_RESP) %>%
+        rename(Persen = NA_PCT, Jumlah = NA_JML)
+    }
   })
   
-  output$presiden_table <- renderDataTable({
+  #rendering the table
+  output$presiden_table <- renderTable({
+    data <- selected_capres_data()
+    data <- data[order(-data$Persen), ]
+    data
+  }, striped = T, bordered = T, digits = 2)
+  
+  ################ viewport ketiga #################
+  #observe event for the action button and checkboxgroup
+  observeEvent(input$electoralmap_button, {
+    selected_parpol <- input$electoralmap_checkbox
     
+    if (length(selected_parpol) > 0) {
+      #creating named vector to map party names to column names
+      parpol_column_map <- c("PDIP" = "PDIP_PCTL",
+                             "Gerindra" = "GE_PCTL",
+                             "Nasdem" = "ND_PCTL",
+                             "Demokrat" = "DEM_PCTL",
+                             "Golkar" = "GK_PCTL",
+                             "Perindo" = "PRD_PCTL",
+                             "PAN" = "PAN_PCTL")
+      
+    gg <- ggplot(electoral_pwr)
+    
+    for (party in selected_parpol) {
+      aes_name <- parpol_column_map[party]
+      legend_label <- paste(party, "Percentile", sep = " ")
+      
+      gg <- gg +
+        geom_sf(aes(fill = .data[[aes_name]]), inherit.aes = F)+
+        scale_fill_gradient(low = "white", high = "red", name = legend_label)
+    }
+    
+    output$electoral_map <- renderPlot({
+      print(gg)
+    })
+    } else {
+      output$electoral_map <- NULL
+    }
   })
+  
+  
   
 }
 
