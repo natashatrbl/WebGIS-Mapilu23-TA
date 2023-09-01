@@ -317,21 +317,34 @@ function(input, output, session) {
                              "Perindo" = "PRD_PCTL",
                              "PAN" = "PAN_PCTL")
       
-    gg <- ggplot(electoral_pwr)
-    
-    for (party in selected_parpol) {
-      aes_name <- parpol_column_map[party]
-      legend_label <- paste(party, "Percentile", sep = " ")
+    #creating ggplot list 
+      gg_plots <- list()
       
-      gg <- gg +
-        geom_sf(aes(fill = .data[[aes_name]]), inherit.aes = F)+
-        scale_fill_gradient(low = "white", high = "red", name = legend_label)
-    }
-    
-    output$electoral_map <- renderPlot({
-      print(gg)
-    })
+      for (party in selected_parpol) {
+        aes_name <- parpol_column_map[party]
+        legend_label <- paste(party, "Percentile", sep = " ")
+        
+        gg <- ggplot(electoral_pwr)+
+          geom_sf(aes(fill = .data[[aes_name]]))+
+          scale_fill_gradient2(low = "orange", mid = "white", high = "red", name = legend_label)+
+          labs(title = legend_label)
+        
+        gg_plots[[party]] <- gg
+      }
+      
+      #set mfrow layout for multiple plots
+      par(mfrow = c(3, length(selected_parpol)))
+      
+      #rendering main panel for multiple plots
+      output$electoral_map <- renderPlot({
+        plot_list <- lapply(selected_parpol, function(party){
+          plot(gg_plots[[party]])
+        })
+        
+        do.call(grid.arrange, plot_list)
+      })
     } else {
+      par(mfrow = c(1, 1))
       output$electoral_map <- NULL
     }
   })
