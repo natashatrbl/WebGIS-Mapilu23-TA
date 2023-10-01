@@ -1,27 +1,77 @@
+
 function(input, output, session) {
   
   ######################## MENU PETA MAPILU ###################################
+  #creating pallete
+  pal1 <- colorNumeric("viridis", NULL)
+  pal2 <- colorFactor(palette = c("#BDC7E2", "#26408B"), domain = c(min(participationmap$KELAS), max(participationmap$KELAS)))
+  pal3 <- colorNumeric(palette = c("#DC143C", "#FA8072", "#FFC0CB"), NULL)
+  pal4 <- colorNumeric(palette = c("#26408B", "#3459E6", "#BDC7E2"), NULL)
+  pal5 <- colorNumeric(palette = c("#FF4500", "#FFA07A", "#FDD5B1"), NULL)
   
-  #access token mapbox
-  key <- 'pk.eyJ1IjoibmF0YXNoYXRyYmwiLCJhIjoiY2t6NWM2eTVtMGU5ZjJ1cGtweDkyd2hoMCJ9.2sEmFzTzZIr9qfTrc8cSbw'
+  #empty leaflet map
+  initialmap <- leaflet() %>%
+    addTiles() %>%
+    addLayersControl(
+      baseGroups = c("Demografi", "Tingkat Partisipasi", "Ganjar Pranowo Persentase", "Prabowo Subianto Persentase", "Anies Baswedan Persentase"),
+      options = layersControlOptions(collapsed = F)
+    )
   
-  #simplified the batas admin
-  pituruh_simplified <- st_simplify(pituruh, dTolerance = 0.05)
-  
-  #validating geometries
-  pituruh_cleared <- st_make_valid(pituruh_simplified)
-  
-  # Rendering mapdeck map
-  output$map <- renderMapdeck({
-    mapdeck(
-      token = key,
-      style = 'mapbox://styles/mapbox/streets-v12',
-      zoom = 10,
-      location = c(110.0093, -7.7129)
-    ) %>%
-      add_geojson(
-        data = pituruh
-      )
+  #render leaflet
+  output$map <- renderLeaflet({
+    initialmap %>%
+      addPolygons(
+        data = demografimap,
+        fillColor = ~pal1(POPULASI),
+        fillOpacity = 1,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.8,
+        group = "Populasi"
+      ) %>%
+      addPolygons(
+        data = participationmap,
+        fillColor = ~pal2(KELAS),
+        fillOpacity = 1,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.8,
+        group = "Tingkat Partisipasi"
+      ) %>%
+      addPolygons(
+        data = electoralmap,
+        fillColor = ~pal3(GP_PCT),
+        fillOpacity = 1,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.8,
+        group = "Ganjar Pranowo Persentase"
+      ) %>%
+      addPolygons(
+        data = electoralmap,
+        fillColor = ~pal5(PS_PCT),
+        fillOpacity = 1,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.8,
+        group = "Prabowo Subianto Persentase"
+      ) %>%
+      addLegend(
+        pal = pal1,
+        values = ~POPULASI,
+        title = "Populasi Purworejo",
+        position = "bottomright"
+      ) %>%
+      addLegend(
+        pal = pal2,
+        values = ~KELAS,
+        title = "Kelas Tingkat Partisipasi Pemilih Pemula Purworejo",
+        position = "bottomright"
+      ) 
   })
 
   
@@ -128,32 +178,87 @@ function(input, output, session) {
   observeEvent(input$showmap_button, {
   
   #plotting the geografi map using ggplot2
-  if (input$demografi_map_option == "Kependudukan") {
-    #plotting the demography map using ggplot2
+  if (input$demografi_map_option == "Populasi") {
     output$demografi_map <- renderPlot({
       ggplot()+
-        geom_sf(data = demografi_pwr,
-                aes(fill = POPULASI))+
+        geom_sf(data = demografi_pwr, aes(fill = POPULASI))+
+        scale_fill_gradient(low = "white", high = "#273811")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Populasi di Kabupaten Purworejo Tahun 2022")
     })
-  } else if (input$demografi_map_option == "Geografis") {
-    #plotting the kependudukan map using ggplot2
+  } else if (input$demografi_map_option == "Kepadatan Penduduk") {
     output$demografi_map <- renderPlot({
       ggplot()+
-        geom_sf(data = demografi_pwr,
-                aes(fill = JARAK_KAB))+
+        geom_sf(data = demografi_pwr, aes(fill = KPDTN_PEND))+
+        scale_fill_gradient(low = "white", high = "#273811")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Kepadatan Penduduk Kabupaten Purworejo Tahun 2022")
+    })
+  } else if (input$demografi_map_option == "Responden Laki-laki") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = RES_BOY))+
+        scale_fill_gradient(low = "white", high = "#273811")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Jumlah Responden Laki-laki")
+    })
+  } else if (input$demografi_map_option == "Responden Perempuan") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = RES_GIRL))+
+        scale_fill_gradient(low = "white", high = "#273811")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Jumlah Responden Laki-laki")
+    })
+  } else if (input$demografi_map_option == "Beragama Islam") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = ISLAM))+
+        scale_fill_gradient(low = "white", high = "#0B2838")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Jumlah Penduduk Beragama Islam")
+    })
+  } else if (input$demografi_map_option == "Beragama Non-Islam") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = NON_ISLAM))+
+        scale_fill_gradient(low = "white", high = "#0B2838")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Jumlah Penduduk Beragama Non-Islam")
+    })
+  } else if (input$demografi_map_option == "Jarak Kabupaten") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = JARAK_KAB))+
+        scale_fill_gradient(low = "white", high = "#F78104")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jarak ke Pusat Kabupaten Per Kecamatan")
+    })
+  } else if (input$demografi_map_option == "Ketinggian Wilayah") {
+    output$demografi_map <- renderPlot({
+      ggplot()+
+        geom_sf(data = demografi_pwr, aes(fill = TINGGI_MDP))+
+        scale_fill_gradient(low = "white", high = "#F78104")+
+        theme_minimal()+
+        theme(panel.grid = element_blank())+
+        labs(title = "Ketinggian Wilayah Per Kecamatan")
     })
   }
     #plotting the tingkat partisipasi map using ggplot2
     output$tingkatpartisipasi_map <- renderPlot({
       ggplot() +
-        geom_sf(data = partisipasi_pwr,
-                aes(fill = SKOR_TOTAL)) +
+        geom_sf(data = partisipasi_pwr, aes(fill = SKOR_TOTAL))+
+        scale_fill_gradient2(low = "#2FB380", mid = "white", high = "#3459E6", midpoint = 25,
+                             breaks = c(17, 25, 32),
+                             labels = c("Kurang Partisipatif", "Cukup Partisipatif", "Sangat Partisipatif"),
+                             limits = c(17, 32))+
         theme_minimal() +
         theme(panel.grid = element_blank()) +
         labs(title = "Skor Tingkat Partisipasi Kabupaten Purworejo")
@@ -177,7 +282,6 @@ function(input, output, session) {
              color = "olive"
              )
   })
-  
   #valueboxoutput persentase parpol legislatif per kecamatan
   output$parpolleg_persentase <- renderValueBox({
     kecamatan_pilihan <- input$kecamatan_elect
@@ -191,7 +295,6 @@ function(input, output, session) {
              color = "navy"
     )
   })
-  
   #valueboxoutput persentase calon presiden per kecamatan
   output$capres_persentase <- renderValueBox({
     kecamatan_pilihan <- input$kecamatan_elect
@@ -236,7 +339,7 @@ function(input, output, session) {
   })
   
   ################ viewport kedua #################
-  #rendering map and table for slider input view
+  #rendering map and table for selectinput value
   elected_data <- electoral_pwr %>%
     select(kode_dagri, geometry, GP_PCT, PS_PCT, AB_PCT, LAIN_PCT, NA_PCT)
   
@@ -333,7 +436,7 @@ function(input, output, session) {
       }
       
       #set mfrow layout for multiple plots
-      par(mfrow = c(3, length(selected_parpol)))
+      par(mfrow = c(2, length(selected_parpol)))
       
       #rendering main panel for multiple plots
       output$electoral_map <- renderPlot({
@@ -348,9 +451,6 @@ function(input, output, session) {
       output$electoral_map <- NULL
     }
   })
-  
-  
-  
 }
 
 

@@ -1,4 +1,6 @@
-# Welcome to the WebGIS Mapilu! This is my final year project about visualizing the preferences of young voters in Purworejo using R Shiny
+
+# Welcome to the WebGIS Mapilu! 
+#This is my final year project about visualizing the preferences of young voters in Purworejo using R Shiny
 
 # Setup library
 library(shiny)
@@ -12,26 +14,29 @@ library(gridExtra)
 library(plotly)
 library(tidyverse)
 library(sf)
-library(mapdeck)
+library(leaflet)
+
 
 #data skoring hasil survei
 data_hasil <- read.csv("data/hasil_survei.csv")
 
-
 #data geojson untuk main map
-pituruh <- sf::st_read("data/Pituruh.geojson")
+electoralmap <- sf::st_read("data/electoralmap_geojson.geojson")
+demografimap <- sf::st_read("data/demografimap_geojson.geojson")
+participationmap <- sf::st_read("data/participationmap_geojson.geojson")
+pointsma_pwr <- sf::st_read("data/point_sma.geojson")
 
 
 #data untuk demografi map
-demografi_pwr <- sf::st_read("data/demografi_map.shp")
+demografi_pwr <- sf::st_read("data/demografimap_geojson.geojson")
 
-partisipasi_pwr <- sf::st_read("data/tingkatpartisipasi_withmap.shp")
+partisipasi_pwr <- sf::st_read("data/participationmap_geojson.geojson")
 
 
 #data untuk electoral map
 electoral_csv <- read.csv("data/electoral_avg.csv")
 
-electoral_pwr <- sf::st_read("data/electoral_map3.shp")
+electoral_pwr <- sf::st_read("data/electoralmap_geojson.geojson")
 
 
 shinyApp(ui, server)

@@ -52,7 +52,10 @@ dashboardPage(
                                        tags$h1("Selamat Datang di Mapilu Purworejo"),
                                        tags$h4("Mapping Analysis of Young Voters Behavior"),
                                        tags$br(),
-                                       tags$p("Pernahkah anda mendengar bahwa pemilih pemula cenderung  apatis dalam pemilu? Benarkah pemuda zaman sekarang apatis atau justru frustasi? Website ini akan membantu anda memahami bagaimana kecenderungan pemilih pemula di Purworejo terhadap pemilu 2024 dari sisi geospasial. Penasaran?"))
+                                       tags$p("Pernahkah anda mendengar bahwa pemilih pemula cenderung  apatis dalam pemilu?
+                                              Benarkah pemuda zaman sekarang apatis atau justru frustasi?
+                                              Website ini akan membantu anda memahami bagaimana kecenderungan pemilih pemula
+                                              di Purworejo terhadap pemilu 2024 dari sisi geospasial. Penasaran?"))
                                 )
                               ),
                      tabPanel("About", h4("Proyek ini menjelaskan tentang...")),
@@ -69,14 +72,14 @@ dashboardPage(
                     width = 9,
                     height = "auto",
                     h2("Peta Preferensi Pemilih Pemula Pemilu 2024"),
-                    mapdeckOutput("map", height = "800px")
+                    leafletOutput("map", height = "800px")
                 )
               )
       ),
       
       ###################### Menu Analisis Demografi - Tingkat Partisipasi #######################
       tabItem(tabName = "demography",
-              # Bar plot dan valuebox untuk demografi - tingkat partisipasi
+              ######## viewport pertama analisis demografi ##########
               fluidRow(
                 #title box
                 box(
@@ -92,16 +95,12 @@ dashboardPage(
                 # Sidebar Panel
                 sidebarPanel(
                   width = 3,
-                  # Selecting kecamatan
                   selectInput("kecamatan", "Pilih Kecamatan",
                               choices = data_hasil$KECAMATAN
                   ),
                   
                   fluidRow(
-                    # Value box untuk gender perempuan
                       valueBoxOutput(width = "100%", "persen_perempuan"),
-                    
-                    #value box untuk usia 17
                       valueBoxOutput(width = "100%","persen_usia17")
                     )
                 ),
@@ -119,7 +118,7 @@ dashboardPage(
                 )
               ),
               
-              #Map for demografi, geografi, and tingkat partisipasi pemilih pemula
+              ###### viewport kedua ###### 
               fluidRow(
                 #title box
                 box(
@@ -136,23 +135,25 @@ dashboardPage(
                   width = 3,
                   #Select the demografi category
                   radioButtons("demografi_map_option", "Pilih salah satu unsur demografi",
-                               choices = c("Geografis", "Kependudukan"),
-                               selected = "Geografis"),
+                               choices = c("Jarak Kabupaten", "Ketinggian Wilayah", "Populasi", 
+                                           "Kepadatan Penduduk", "Responden Laki-laki", "Responden Perempuan",
+                                           "Beragama Islam", "Beragama Non-Islam"),
+                               selected = "Jarak Kabupaten"),
                   actionButton("showmap_button", "Tampilkan Peta")
                 ),
                 mainPanel(
                   width = 9,
-                          column(6,
-                                 plotOutput("demografi_map")),
-                          column(6,
-                                 plotOutput("tingkatpartisipasi_map"))
+                  column(6,
+                         plotOutput("demografi_map")),
+                  column(6,
+                         plotOutput("tingkatpartisipasi_map"))
+                )
               )
-            )
       ),
       
       ########################### Menu Electoral Vote ###########################
       tabItem(tabName = "electoral",
-              # Menu bar plot dan infobox
+              ####### viewport pertama: Menu bar plot dan infobox #########
               fluidRow(
                 #title box
                 box(
@@ -193,7 +194,7 @@ dashboardPage(
                 )
             ),
             
-            #Menu map for tingkat partisipasi and presiden percentage
+            ######## viewport kedua: Menu map for tingkat partisipasi and presiden percentage ########
             fluidRow(
               #title box
               box(
@@ -224,7 +225,7 @@ dashboardPage(
                     "Silahkan memilih salah satu nama calon presiden, maka anda akan melihat peta visualisasi dominasi setiap nama calon berdasarkan kecamatan")
                 )
                       ),
-              #main Panel tampilan map detail per kecamatan berdasarkan slider dan matching rows 
+              #main Panel tampilan map detail per kecamatan berdasarkan slider input dan table output 
               mainPanel(
                   width = 9,
                     column(8,
@@ -234,18 +235,18 @@ dashboardPage(
                 )
               ),
             
-            #menu map untuk tampilan keseluruhan detail visualisasi yang dapat dibandingkan satu sama lain 
+            ####### viewport ketiga: menu map untuk tampilan perbandingan persentase parpol #######
             fluidRow(
               #title box
               box(
-                title = "Perbandingan Parameter dalam bentuk Peta Choropleth",
+                title = "Perbandingan Partai Politik untuk Pemilu Legislatif dalam bentuk Peta Choropleth",
                 status = "primary",
                 background = "navy",
                 width = 12,
                 collapsible = T,
                 div(
                   style = "color: white; padding: 2rem; font-size: 15px",
-                  "Saatnya membandingkan masing-masing parameter dengan melihat peta! Apakah anda dapat menemukan kesimpulan keterkaitan masing-masing parameter? Mari kita lihat bagaimana pemetaan ini sangat berguna untuk mengetahui keterkaitan antar variabel dalam suatu wilayah!")
+                  "Saatnya membandingkan masing-masing partai politik dengan melihat peta! Anda dapat melihat bagaimana dominasi setiap partai politik menurut kaum muda berdasarkan kecamatan. Pada menu ini anda dapat memilih lebih dari satu partai politik untuk melihat perbandingannya. Ada 7 partai politik yang paling mendominasi berdasarkan respon dari survei langsung pada pemilih pemula di Purworejo.")
               ),
               #sidebar panel checkboxgroup dan action button
               sidebarPanel(
