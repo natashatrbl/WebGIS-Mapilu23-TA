@@ -66,14 +66,44 @@ dashboardPage(
       
       ###################### Menu Peta Mapilu #############################
       tabItem(tabName = "viz",
+              ##### viewport pertama #####
               fluidRow(
-                box(title = "Peta Preferensi Pemilih Pemula",
-                    status = "primary",
+                #title box
+                box(
+                  title = "Peta Preferensi Pemilih Pemula Kabupaten Purworejo",
+                  status = "primary",
+                  background = "navy",
+                  width = 12,
+                  collapsible = T,
+                  div(
+                    style = "color: white; padding: 2rem; font-size: 15px",
+                    "Pada menu ini anda akan melihat bagaimana visualisasi hasil pemetaan preferensi pemilih pemula di Kabupaten Purworejo beserta beberapa informasi dan grafik yang menunjang detail visualisasi")
+                ),
+                sidebarPanel(
+                  width = 3,
+                  fluidRow(
+                    valueBoxOutput(width = "100%", "asal"),
+                    valueBoxOutput(width = "100%", "usia"),
+                    valueBoxOutput(width = "100%", "gender"),
+                    valueBoxOutput(width = "100%", "pekerjaan_ortu"),
+                    valueBoxOutput(width = "100%", "penghasilan_ortu"),
+                    valueBoxOutput(width = "100%", "skor_partisipasi")
+                  )
+                ),
+                  mainPanel(
                     width = 9,
-                    height = "auto",
-                    h2("Peta Preferensi Pemilih Pemula Pemilu 2024"),
                     leafletOutput("map", height = "800px")
-                )
+                  )
+              ),
+              ##### viewport kedua #####
+              fluidRow(
+                column(5, plotlyOutput("barplot_capres")),
+                column(7, plotlyOutput("barplot_leg"))
+              ),
+              fluidRow(
+                column(4, plotlyOutput("barplot_ind5")),
+                column(4, plotlyOutput("barplot_ind8")),
+                column(4, plotlyOutput("barplot_ind9"))
               )
       ),
       
@@ -98,7 +128,6 @@ dashboardPage(
                   selectInput("kecamatan", "Pilih Kecamatan",
                               choices = data_hasil$KECAMATAN
                   ),
-                  
                   fluidRow(
                       valueBoxOutput(width = "100%", "persen_perempuan"),
                       valueBoxOutput(width = "100%","persen_usia17")
@@ -229,7 +258,7 @@ dashboardPage(
               mainPanel(
                   width = 9,
                     column(8,
-                          plotOutput("presiden_map")),
+                          plotlyOutput("presiden_map")),
                     column(4,
                            tableOutput("presiden_table"))
                 )
@@ -282,5 +311,3 @@ dashboardPage(
     )
   )
 )
-
-

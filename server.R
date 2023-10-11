@@ -2,81 +2,374 @@
 function(input, output, session) {
   
   ######################## MENU PETA MAPILU ###################################
-  #creating pallete
-  pal1 <- colorNumeric("viridis", NULL)
-  pal2 <- colorFactor(palette = c("#BDC7E2", "#26408B"), domain = c(min(participationmap$KELAS), max(participationmap$KELAS)))
-  pal3 <- colorNumeric(palette = c("#DC143C", "#FA8072", "#FFC0CB"), NULL)
-  pal4 <- colorNumeric(palette = c("#26408B", "#3459E6", "#BDC7E2"), NULL)
-  pal5 <- colorNumeric(palette = c("#FF4500", "#FFA07A", "#FDD5B1"), NULL)
   
-  #empty leaflet map
-  initialmap <- leaflet() %>%
-    addTiles() %>%
+  ###### Map View ######
+  ##### creating pallete #####
+  #demographic palette
+  pal1 <- colorNumeric("viridis", NULL)
+  #participation map palette
+  #data belum direklasifikasi
+  pal2 <- colorFactor(palette = c("#a1dab4", "#2c7fb8"), domain = c(min(summarymap$KELAS), max(summarymap$KELAS)))
+  pal3 <- colorFactor(palette = c("#a1dab4", "#2c7fb8"), domain = c(min(summarymap$KL_FIL), max(summarymap$KL_FIL)))
+  pal4 <- colorFactor(palette = c("#a1dab4", "#2c7fb8"), domain = c(min(summarymap$KL_IND), max(summarymap$KL_IND)))
+  labels1 <- c("(18 - 25)", "(26 - 32)")
+  #setelah direklasifikasi
+  palette1 <- c("Sangat Rendah" = "#ffffcc", "Rendah" = "#a1dab4", "Sedang" = "#41b6c4", "Tinggi" = "#2c7fb8", "Sangat Tinggi" = "#253494")
+  levels1 <- c("Sangat Rendah", "Rendah", "Sedang", "Tinggi", "Sangat Tinggi")
+  summarymap$REKLAS_KL <- factor(summarymap$REKLAS_KL, levels = levels1)
+  pal6 <- colorFactor(palette = palette1, domain = summarymap$REKLAS_KL)
+  summarymap$REKLAS_KLFIL <- factor(summarymap$REKLAS_KLFIL, levels = levels1)
+  pal7 <- colorFactor(palette = palette1, domain = summarymap$REKLAS_KLFIL)
+  summarymap$REKLAS_IND <- factor(summarymap$REKLAS_IND, levels = levels1)
+  pal8 <- colorFactor(palette = palette1, domain = summarymap$REKLAS_IND)
+  summarymap$REKLAS_INDFIL <- factor(summarymap$REKLAS_INDFIL, levels = levels1)
+  pal9 <- colorFactor(palette = palette1, domain = summarymap$REKLAS_INDFIL)
+  #electoral palette
+  colour_palette <- c("Ganjar Pranowo" = "red", "Belum Menentukan Pilihan" = "yellow", "Prabowo Subianto" = "orange")
+  summarymap$KL_MAXPRES <- factor(summarymap$KL_MAXPRES)
+  factpal <- colorFactor(palette = colour_palette, domain = summarymap$KL_MAXPRES)
+  summarymap$KLPRES_FIL <- factor(summarymap$KLPRES_FIL)
+  factpal2 <- colorFactor(palette = colour_palette, domain = summarymap$KLPRES_FIL)
+    
+  ##### empty leaflet map #####
+  initialmap <- leaflet(summarymap) %>%
+    addProviderTiles(
+      provider = "CartoDB.Positron",
+      options = providerTileOptions(noWrap = TRUE),
+      group = "Light"
+    ) %>%
+    addProviderTiles(
+      provider = "OpenStreetMap.Mapnik",
+      options = providerTileOptions(noWrap = TRUE),
+      group = "Street"
+    ) %>%
+    addProviderTiles(
+      provider = "CartoDB.DarkMatter",
+      options = providerTileOptions(noWrap = TRUE),
+      group = "Dark"
+    ) %>%
+    addProviderTiles(
+      provider = "Esri.WorldImagery",
+      options = providerTileOptions(noWrap = TRUE),
+      group = "Satellite"
+    ) %>%
     addLayersControl(
-      baseGroups = c("Demografi", "Tingkat Partisipasi", "Ganjar Pranowo Persentase", "Prabowo Subianto Persentase", "Anies Baswedan Persentase"),
-      options = layersControlOptions(collapsed = F)
+      baseGroups = c("Light", "Dark", "Street", "Satellite"),
+      overlayGroups = c("Demografi", 
+                        "Tingkat Partisipasi", 
+                        "Tingkat Partisipasi Filtered", 
+                        "Tingkat Partisipasi Indikator",
+                        "Tingkat Partisipasi Reclassified", 
+                        "Tingkat Partisipasi Filter Reclassified",
+                        "Tingkat Partisipasi Indikator Reclassified",
+                        "Tingkat Partisipasi Indikator Filter Reclassified",
+                        "Persentase Capres"),
+      options = layersControlOptions(collapsed = T),
+      position = "topleft"
+    ) %>%
+    addEasyButton(easyButton(
+      icon = "fa-crosshairs", 
+      title = "Locate Me",
+      onClick = JS("function(btn, map){ map.locate({setView: true}); }"))
     )
   
-  #render leaflet
+  ##### render leaflet ####
   output$map <- renderLeaflet({
     initialmap %>%
+      ##### Peta Demografi #####
       addPolygons(
-        data = demografimap,
-        fillColor = ~pal1(POPULASI),
-        fillOpacity = 1,
+        data = summarymap,
+        fillColor = ~pal1(POP),
+        fillOpacity = 0.8,
         stroke = T,
         color = "white",
         weight = 1,
-        opacity = 0.8,
-        group = "Populasi"
-      ) %>%
-      addPolygons(
-        data = participationmap,
-        fillColor = ~pal2(KELAS),
-        fillOpacity = 1,
-        stroke = T,
-        color = "white",
-        weight = 1,
-        opacity = 0.8,
-        group = "Tingkat Partisipasi"
-      ) %>%
-      addPolygons(
-        data = electoralmap,
-        fillColor = ~pal3(GP_PCT),
-        fillOpacity = 1,
-        stroke = T,
-        color = "white",
-        weight = 1,
-        opacity = 0.8,
-        group = "Ganjar Pranowo Persentase"
-      ) %>%
-      addPolygons(
-        data = electoralmap,
-        fillColor = ~pal5(PS_PCT),
-        fillOpacity = 1,
-        stroke = T,
-        color = "white",
-        weight = 1,
-        opacity = 0.8,
-        group = "Prabowo Subianto Persentase"
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan:<b>", summarymap$kecamatan, "<br>", "<b>Populasi:<b>", summarymap$POP, "<br>", "<b>Kepadatan:<b>", summarymap$KPDTN),
+        group = "Demografi"
       ) %>%
       addLegend(
         pal = pal1,
-        values = ~POPULASI,
+        values = ~POP,
         title = "Populasi Purworejo",
-        position = "bottomright"
+        position = "bottomright",
+        group = "Demografi",
+        bins = 3
+      ) %>%
+      ##### Peta Tingkat Partisipasi Unreclassified #####
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal2(KELAS),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_TOT, "<br>", "<b>Kelas:<b>", summarymap$KELAS),
+        group = "Tingkat Partisipasi"
       ) %>%
       addLegend(
         pal = pal2,
-        values = ~KELAS,
-        title = "Kelas Tingkat Partisipasi Pemilih Pemula Purworejo",
-        position = "bottomright"
+        values = ~paste(KELAS),
+        title = "Kelas Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi"
+      ) %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal3(KL_FIL),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_TOT_FIL, "<br>", "<b>Kelas:<b>", summarymap$KL_FIL),
+        group = "Tingkat Partisipasi Filtered"
+      ) %>%
+      addLegend(
+        pal = pal3,
+        values = ~KL_FIL,
+        title = "Kelas Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Filtered"
+      ) %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal4(KL_IND),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_IND, "<br>", "<b>Kelas:<b>", summarymap$KL_IND),
+        group = "Tingkat Partisipasi Indikator"
+      ) %>%
+      addLegend(
+        pal = pal4,
+        values = ~KL_IND,
+        title = "Kelas Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Indikator"
+      ) %>%
+      ##### Peta Tingkat Partisipasi Reclassified #####
+      addPolygons(
+      data = summarymap,
+      fillColor = ~pal6(REKLAS_KL),
+      fillOpacity = 0.8,
+      stroke = T,
+      color = "white",
+      weight = 1,
+      opacity = 0.7,
+      highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+      popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_TOT, "<br>", "<b>Kelas:<b>", summarymap$REKLAS_KL),
+      group = "Tingkat Partisipasi Reclassified"
+      ) %>%
+      addLegend(
+        pal = pal6,
+        values = ~REKLAS_KL,
+        title = "Reklasifikasi Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Reclassified"
+      ) %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal7(REKLAS_KLFIL),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_TOT_FIL, "<br>", "<b>Kelas:<b>", summarymap$REKLAS_KLFIL),
+        group = "Tingkat Partisipasi Filter Reclassified"
+      ) %>%
+      addLegend(
+        pal = pal7,
+        values = ~REKLAS_KLFIL,
+        title = "Reklasifikasi Tingkat Partisipasi Filter",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Filter Reclassified"
+      ) %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal8(REKLAS_IND),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_IND, "<br>", "<b>Kelas:<b>", summarymap$REKLAS_IND),
+        group = "Tingkat Partisipasi Indikator Reclassified"
+      ) %>%
+      addLegend(
+        pal = pal8,
+        values = ~REKLAS_IND,
+        title = "Reklasifikasi Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Indikator Reclassified"
+      ) %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = ~pal9(REKLAS_INDFIL),
+        fillOpacity = 0.8,
+        stroke = T,
+        color = "white",
+        weight = 1,
+        opacity = 0.7,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>", "<b>Skor:<b>", summarymap$SK_INDFIL, "<br>", "<b>Kelas:<b>", summarymap$REKLAS_INDFIL),
+        group = "Tingkat Partisipasi Indikator Filter Reclassified"
+      ) %>%
+      addLegend(
+        pal = pal9,
+        values = ~REKLAS_INDFIL,
+        title = "Reklasifikasi Tingkat Partisipasi",
+        position = "bottomright",
+        group = "Tingkat Partisipasi Indikator Filter Reclassified"
+      ) %>%
+      ##### Peta Electoral Vote #####
+      addPolygons(
+        data = summarymap,
+        group = "Persentase Capres",
+        fillColor = ~factpal(KL_MAXPRES),
+        fillOpacity = 0.8,
+        color = "white",
+        weight = 1,
+        opacity = 1,
+        highlightOptions = highlightOptions(weight = 2, color = "black", fillOpacity = 0.5, bringToFront = T),
+        popup = paste("<b>Kecamatan<b>", summarymap$kecamatan, "<br>",
+                      "<b>Ganjar Pranowo<b>", summarymap$GP_PCT, "<br>",
+                      "Prabowo Subianto", summarymap$PS_PCT, "<br>",
+                      "Anies Baswedan", summarymap$AB_PCT, "<br>",
+                      "Lainnya", summarymap$LAIN_PCT, "<br>",
+                      "Belum Menentukan Pilihan", summarymap$NA_PCT)
+      ) %>%
+      addLegend(
+        colors = colour_palette,
+        labels = names(colour_palette),
+        title = "Kategori Persentase",
+        position = "bottomright",
+        group = "Persentase Capres"
       ) 
   })
+  
+  ########## Sidebar Menu ##########
+  #valuebox output
+  output$asal <- renderValueBox({
+    valueBox(subtitle = "Responden Berasal Dari Purwodadi",
+             value = 96,
+             icon = icon("location-dot"),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  output$usia <- renderValueBox({
+    age_count <- table(data_hasil$USIA)
+    dominating_age <- as.integer(names(age_count)[which.max(age_count)])
+    valueBox(subtitle = "Usia Responden Terbanyak",
+             value = paste(dominating_age, "Tahun"),
+             icon = icon("users"),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  output$gender <- renderValueBox({
+    percentile_gender <- round(sum(data_hasil$GENDER == "Perempuan") / nrow(data_hasil) * 100, 2)
+    valueBox(subtitle = "Persentase Responden Jenis Kelamin Perempuan",
+             value = paste(percentile_gender, "%"),
+             icon = icon("venus-mars"),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  output$pekerjaan_ortu <- renderValueBox({
+    percentile_work <- round(sum(data_hasil$PKRJ_ORTU == "Buruh") / nrow(data_hasil) * 100, 2)
+    valueBox(subtitle = "Persentase Pekerjaan Orang Tua Responden sebagai Buruh",
+             value = paste(percentile_work, "%"),
+             icon = icon("briefcase"),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  output$penghasilan_ortu <- renderValueBox({
+    percentile_bills <- round(sum(data_hasil$GAJI_ORTU == "<Rp1.000.000,00") / nrow(data_hasil) * 100, 2)
+    valueBox(subtitle = "Persentase Penghasilan Orang Tua Responden <Rp1.000.000,00",
+             value = paste(percentile_bills, "%"),
+             icon = icon("money-bill-wave"),
+             width = "100%",
+             color = "navy"
+    )
+  })
+  output$skor_partisipasi <- renderValueBox({
+    mean_participation <- round(mean(data_hasil$SKOR_TOTAL), 2)
+    valueBox(subtitle = "Skor Rata-Rata Tingkat Partisipasi Pemilih Pemula di Kabupaten Purworejo",
+             value = mean_participation,
+             icon = icon("square-poll-vertical"),
+             width = "100%",
+             color = "navy"
+    )
+  })
 
+  #barplot_capres
+  color_capres <- c("Ganjar Pranowo" = "#d7191c", "Prabowo Subianto" = "#fdae61", "Anies Baswedan" = "#2c7bb6", "Lainnya" = "#abd9e9", "Belum menentukan pilihan" = "#ffffbf")
+  output$barplot_capres <- renderPlotly({
+    p <- ggplot(data = data_hasil)+
+      geom_bar(aes(x = str_wrap(CAPRES, width = 5), fill = CAPRES), stat = "count")+
+      scale_fill_manual(values = color_capres)+
+      guides(fill = F)+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = "Jumlah Suara Capres Keseluruhan", x = "Nama Capres", y = "Jumlah Suara")
+    ggplotly(p, tooltip = c("count"))
+  })
+  #barplot_legislatif
+  color_legis <- c("Demokrat" = "#1f78b4", "Gerindra" = "#ff7f00", "Golkar" = "#ffff99", "PDIP" = "#e31a1c", "Nasdem" = "#a6cee3", "PAN" = "#fdbf6f", "Perindo" = "#6a3d9a", "PKB" = "#cab2d6", "PSI" = "#fb9a99", "PKS" = "#b2df8a", "PPP" = "#33a02c")
+  output$barplot_leg <- renderPlotly({
+    p <- ggplot(data = data_hasil)+
+      geom_bar(aes(x = str_wrap(PARTAI_LEGISLATIF, width = 7), fill = PARTAI_LEGISLATIF), stat = "count")+
+      scale_fill_manual(values = color_legis)+
+      guides(fill = F)+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = "Jumlah Suara Parpol Legislatif", x = "Nama Parpol", y = "Jumlah Suara")
+    ggplotly(p, tooltip = c("count"))
+  })
+  #barplot_ind5
+  output$barplot_ind5 <- renderPlotly({
+    p <- ggplot(data = data_hasil)+
+      geom_bar(aes(x = IND5), stat = "count", fill = "#2FB380")+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = "Pendapat Responden Tentang Golput", x = "Pendapat Pemilih Pemula Tentang Golput", y = "Jumlah")
+    ggplotly(p, tooltip = c("count"))
+  })
+  #barplot_ind8
+  output$barplot_ind8 <- renderPlotly({
+    p <- ggplot(data = data_hasil)+
+      geom_bar(aes(x = IND8), stat = "count", fill = "#3459E6")+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = "Apakah Responden akan Memberikan Hak Suara", x = "Pendapat Tentang Hak Suara", y = "Jumlah")
+    ggplotly(p, tooltip = c("count"))
+  })
+  #barplot_ind9
+  output$barplot_ind9 <- renderPlotly({
+    p <- ggplot(data = data_hasil)+
+      geom_bar(aes(x = IND9), stat = "count", fill = "#141414")+
+      theme_minimal()+
+      theme(panel.grid = element_blank())+
+      labs(title = "Apakah Responden Masa Bodoh Terhadap Hasil Pemilu?", x = "Pendapat Tentang Hasil Pemilu", y = "Jumlah")
+    ggplotly(p, tooltip = c("count"))
+  })
+  
+  
   
   ######################## MENU DEMOGRAFI #################################
-  
   ################ Viewport pertama ##################
   #value box persentase perempuan per kecamatan
   output$persen_perempuan <- renderValueBox({
@@ -179,7 +472,7 @@ function(input, output, session) {
   
   #plotting the geografi map using ggplot2
   if (input$demografi_map_option == "Populasi") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = POPULASI))+
         scale_fill_gradient(low = "white", high = "#273811")+
@@ -188,7 +481,7 @@ function(input, output, session) {
         labs(title = "Populasi di Kabupaten Purworejo Tahun 2022")
     })
   } else if (input$demografi_map_option == "Kepadatan Penduduk") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = KPDTN_PEND))+
         scale_fill_gradient(low = "white", high = "#273811")+
@@ -197,7 +490,7 @@ function(input, output, session) {
         labs(title = "Kepadatan Penduduk Kabupaten Purworejo Tahun 2022")
     })
   } else if (input$demografi_map_option == "Responden Laki-laki") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = RES_BOY))+
         scale_fill_gradient(low = "white", high = "#273811")+
@@ -206,7 +499,7 @@ function(input, output, session) {
         labs(title = "Jumlah Responden Laki-laki")
     })
   } else if (input$demografi_map_option == "Responden Perempuan") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = RES_GIRL))+
         scale_fill_gradient(low = "white", high = "#273811")+
@@ -215,7 +508,7 @@ function(input, output, session) {
         labs(title = "Jumlah Responden Laki-laki")
     })
   } else if (input$demografi_map_option == "Beragama Islam") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = ISLAM))+
         scale_fill_gradient(low = "white", high = "#0B2838")+
@@ -224,7 +517,7 @@ function(input, output, session) {
         labs(title = "Jumlah Penduduk Beragama Islam")
     })
   } else if (input$demografi_map_option == "Beragama Non-Islam") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = NON_ISLAM))+
         scale_fill_gradient(low = "white", high = "#0B2838")+
@@ -233,7 +526,7 @@ function(input, output, session) {
         labs(title = "Jumlah Penduduk Beragama Non-Islam")
     })
   } else if (input$demografi_map_option == "Jarak Kabupaten") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = JARAK_KAB))+
         scale_fill_gradient(low = "white", high = "#F78104")+
@@ -242,7 +535,7 @@ function(input, output, session) {
         labs(title = "Jarak ke Pusat Kabupaten Per Kecamatan")
     })
   } else if (input$demografi_map_option == "Ketinggian Wilayah") {
-    output$demografi_map <- renderPlot({
+    output$demografi_map <- renderPlotly({
       ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = TINGGI_MDP))+
         scale_fill_gradient(low = "white", high = "#F78104")+
@@ -252,9 +545,9 @@ function(input, output, session) {
     })
   }
     #plotting the tingkat partisipasi map using ggplot2
-    output$tingkatpartisipasi_map <- renderPlot({
+    output$tingkatpartisipasi_map <- renderPlotly({
       ggplot() +
-        geom_sf(data = partisipasi_pwr, aes(fill = SKOR_TOTAL))+
+        geom_sf(data = partisipasi_pwr, aes(fill = SK_TOTAL))+
         scale_fill_gradient2(low = "#2FB380", mid = "white", high = "#3459E6", midpoint = 25,
                              breaks = c(17, 25, 32),
                              labels = c("Kurang Partisipatif", "Cukup Partisipatif", "Sangat Partisipatif"),
@@ -266,6 +559,8 @@ function(input, output, session) {
 })
   
 
+  
+  
   ######################## MENU ELECTORAL VOTE ###################################
   
   ################ viewport pertama #################
@@ -277,7 +572,7 @@ function(input, output, session) {
     mean_partisipatif_round <- round(mean_partisipatif, 2)
     
     valueBox(value = mean_partisipatif_round,
-             subtitle = paste0("Rerata Skor Tingkat Partisipasi Politik di ", input$kecamatan_elect),
+             subtitle = paste0("Rerata Skor Tingkat Partisipasi di ", input$kecamatan_elect),
              width = "100%",
              color = "olive"
              )
@@ -341,29 +636,29 @@ function(input, output, session) {
   ################ viewport kedua #################
   #rendering map and table for selectinput value
   elected_data <- electoral_pwr %>%
-    select(kode_dagri, geometry, GP_PCT, PS_PCT, AB_PCT, LAIN_PCT, NA_PCT)
+    select(kode_dagri, kecamatan, geometry, GP_PCT, PS_PCT, AB_PCT, LAIN_PCT, NA_PCT)
   
   observe({
-  #filtering select input
-  selected_capres <- input$capres_selector
-  
-  #creating a column list connected with the selectInput
-  column_name <- switch(selected_capres,
-                  "Ganjar Pranowo" = "GP_PCT",
-                  "Prabowo Subianto" = "PS_PCT",
-                  "Anies Baswedan" = "AB_PCT",
-                  "Lainnya" = "LAIN_PCT",
-                  "Belum Menentukan Pilihan" = "NA_PCT"
-           )
-  
-  #plotting the map
-  output$presiden_map <- renderPlot({
-    ggplot()+
-      geom_sf(data = elected_data, aes(fill = .data[[column_name]]))+
-      scale_fill_gradient(name = selected_capres)+
-      labs(fill = selected_capres)+
-      theme_minimal()
+    #filtering select input
+    selected_capres <- input$capres_selector
     
+    #creating a column list connected with the selectInput
+    column_name <- switch(selected_capres,
+                          "Ganjar Pranowo" = "GP_PCT",
+                          "Prabowo Subianto" = "PS_PCT",
+                          "Anies Baswedan" = "AB_PCT",
+                          "Lainnya" = "LAIN_PCT",
+                          "Belum Menentukan Pilihan" = "NA_PCT"
+    )
+    
+    #plotting the map
+    output$presiden_map <- renderPlotly({
+      p <- ggplot()+
+        geom_sf(data = elected_data, aes(fill = .data[[column_name]], text = paste("Kecamatan:", kecamatan)))+
+        scale_fill_gradient(name = selected_capres)+
+        labs(fill = selected_capres)+
+        theme_minimal()
+      ggplotly(p, tooltip = "text")
     })
   })
     
@@ -436,7 +731,7 @@ function(input, output, session) {
       }
       
       #set mfrow layout for multiple plots
-      par(mfrow = c(2, length(selected_parpol)))
+      par(mfrow = c(length(selected_parpol), 1))
       
       #rendering main panel for multiple plots
       output$electoral_map <- renderPlot({

@@ -14,81 +14,41 @@ library(gridExtra)
 library(plotly)
 library(tidyverse)
 library(sf)
+library(htmltools)
+library(htmlwidgets)
 library(leaflet)
+library(leaflet.extras)
+library(mapdeck)
 
 
 #data skoring hasil survei
 data_hasil <- read.csv("data/hasil_survei.csv")
+data_hasil_fil <- read.csv("data/hasil_survei_fil.csv")
+summarycsv <- read.csv("data/summarymap.csv")
 
 #data geojson untuk main map
 electoralmap <- sf::st_read("data/electoralmap_geojson.geojson")
+electoralmap_fil <- sf::st_read("data/electoralmapfil_geojson.geojson")
 demografimap <- sf::st_read("data/demografimap_geojson.geojson")
-participationmap <- sf::st_read("data/participationmap_geojson.geojson")
+participationmap <- sf::st_read("data/participationmapun-fil_geojson.geojson")
+summarymap <- sf::st_read("data/summap_un-fil_geojson.geojson")
 pointsma_pwr <- sf::st_read("data/point_sma.geojson")
 
 
 #data untuk demografi map
 demografi_pwr <- sf::st_read("data/demografimap_geojson.geojson")
 
-partisipasi_pwr <- sf::st_read("data/participationmap_geojson.geojson")
+partisipasi_pwr <- sf::st_read("data/participationmapun-fil_geojson.geojson")
 
 
 #data untuk electoral map
 electoral_csv <- read.csv("data/electoral_avg.csv")
+electoralfil_csv <- read.csv("data/electoral_avg_fil.csv")
 
 electoral_pwr <- sf::st_read("data/electoralmap_geojson.geojson")
+electoral_pwr_fil <- sf::st_read("data/electoralmapfil_geojson.geojson")
 
 
 shinyApp(ui, server)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#rendering table
-#output$hasilsurvei_tabel <- DT::renderDataTable({
-
-#selecting columns to display in the table
-#selected_cols <- c("USIA", "GENDER", "KECAMATAN", "SKOR", "KELAS", "CAPRES")
-
-#showing the select input
-#kecamatanFilter <- subset(data_hasil, data_hasil$KECAMATAN == input$kecamatan1)
-#kecamatanFilter
-
-#select only the desired columns from the filtered user input
-#data_subset <- kecamatanFilter %>%
-#select(KECAMATAN, !!!selected_cols)  # Using !!! to unquote the column names
-
-#render the data table
-#DT::datatable(data_subset, options = list(pageLength = 10))
-#})
-
-
-#Dummy plot in demografi fields
-#output$hasilsurvei_plot <- renderPlotly({
-
-#p <- ggplot(data_hasil, 
-#aes(x= .data[[input$variables2]]))+
-#geom_bar(stat = "count")+
-#ggtitle("Perhitungan Statistik Berdasarkan Kategori")+
-#coord_flip()
-
-#ggplotly(p)
-#})

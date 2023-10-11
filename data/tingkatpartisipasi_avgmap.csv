@@ -1,17 +1,17 @@
-﻿KECAMATAN,SKOR_TOTAL,KELAS
-Bayan,24.271,Cukup Partisipatif
-Bagelen,23.750,Cukup Partisipatif
-Butuh,24.373,Cukup Partisipatif
-Banyuurip,23.103,Cukup Partisipatif
-Gebang,24.489,Cukup Partisipatif
-Grabag,25.808,Sangat Partisipatif
-Kemiri,25.525,Sangat Partisipatif
-Ngombol,24.174,Cukup Partisipatif
-Kutoarjo,24.773,Cukup Partisipatif
-Kaligesing,23.842,Cukup Partisipatif
-Purworejo,24.076,Cukup Partisipatif
-Purwodadi,23.635,Cukup Partisipatif
-Bener,24.946,Cukup Partisipatif
-Bruno,24.364,Cukup Partisipatif
-Pituruh,24.288,Cukup Partisipatif
-Loano,24.119,Cukup Partisipatif
+﻿KECAMATAN,SK_TOTAL,KELAS,SK_TOT_FIL,KL_FIL,SK_IND,KL_IND,SK_INDFIL,KL_INDFIL,REKLAS_KLFIL,REKLAS_KL,REKLAS_IND,REKLAS_INDFIL
+Bayan,23.75,Sedang,24.25,Sedang,5.61,Tinggi,5.875,Tinggi,Sedang,Sedang,Rendah,Rendah
+Bagelen,23.103,Sedang,23.13,Sedang,5.31,Sedang,5.461538462,Tinggi,Sangat Rendah,Sangat Rendah,Sangat Rendah,Sangat Rendah
+Butuh,24.271,Sedang,24.33,Sedang,6.08,Tinggi,6.086956522,Tinggi,Sedang,Sedang,Tinggi,Sedang
+Banyuurip,24.946,Sedang,24.94,Sedang,5.92,Tinggi,6.028571429,Tinggi,Tinggi,Tinggi,Sedang,Sedang
+Gebang,24.364,Sedang,24.44,Sedang,6,Tinggi,6.09375,Tinggi,Sedang,Sedang,Tinggi,Sedang
+Grabag,24.373,Sedang,24.56,Sedang,5.88,Tinggi,6,Tinggi,Sedang,Sedang,Sedang,Sedang
+Kemiri,24.489,Sedang,24.6,Sedang,6.2,Tinggi,6.325,Tinggi,Sedang,Sedang,Sangat Tinggi,Tinggi
+Ngombol,25.808,Tinggi,25.69,Tinggi,6.31,Tinggi,6.192307692,Tinggi,Sangat Tinggi,Sangat Tinggi,Sangat Tinggi,Tinggi
+Kutoarjo,23.842,Sedang,24.22,Sedang,5.74,Tinggi,5.888888889,Tinggi,Sedang,Sedang,Sedang,Rendah
+Kaligesing,25.525,Tinggi,25.75,Tinggi,6.35,Tinggi,6.563380282,Tinggi,Sangat Tinggi,Sangat Tinggi,Sangat Tinggi,Sangat Tinggi
+Purworejo,24.773,Sedang,24.93,Sedang,6.27,Tinggi,6.482758621,Tinggi,Tinggi,Tinggi,Sangat Tinggi,Sangat Tinggi
+Purwodadi,24.119,Sedang,24.67,Sedang,5.9,Tinggi,6.212121212,Tinggi,Sedang,Sedang,Sedang,Tinggi
+Bener,24.174,Sedang,24.39,Sedang,5.5,Tinggi,5.903225806,Tinggi,Sedang,Sedang,Sangat Rendah,Rendah
+Bruno,24.288,Sedang,25.02,Tinggi,5.99,Tinggi,6.617021277,Tinggi,Tinggi,Tinggi,Tinggi,Sangat Tinggi
+Pituruh,23.635,Sedang,23.98,Sedang,5.65,Tinggi,6.107692308,Tinggi,Rendah,Rendah,Rendah,Sedang
+Loano,24.076,Sedang,24.53,Sedang,6.06,Tinggi,6.290909091,Tinggi,Sedang,Sedang,Tinggi,Tinggi
