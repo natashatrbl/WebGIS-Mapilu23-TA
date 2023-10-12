@@ -25,6 +25,7 @@ library(mapdeck)
 data_hasil <- read.csv("data/hasil_survei.csv")
 data_hasil_fil <- read.csv("data/hasil_survei_fil.csv")
 summarycsv <- read.csv("data/summarymap.csv")
+point_sma <- read.csv("data/point_sma.csv")
 
 #data geojson untuk main map
 electoralmap <- sf::st_read("data/electoralmap_geojson.geojson")
@@ -32,7 +33,6 @@ electoralmap_fil <- sf::st_read("data/electoralmapfil_geojson.geojson")
 demografimap <- sf::st_read("data/demografimap_geojson.geojson")
 participationmap <- sf::st_read("data/participationmapun-fil_geojson.geojson")
 summarymap <- sf::st_read("data/summap_un-fil_geojson.geojson")
-pointsma_pwr <- sf::st_read("data/point_sma.geojson")
 
 
 #data untuk demografi map

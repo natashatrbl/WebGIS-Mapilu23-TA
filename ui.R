@@ -31,6 +31,62 @@ dashboardPage(
   
   ######################### DASHBOARD BODY ###########################
   dashboardBody(
+    ###### media queries ######
+    tags$head(
+      tags$style(HTML(
+        "
+        /* small phones (max-width 600px) */
+        @media screen and (max-width: 600px) {
+        /* adjust style for small phones */
+        .main-header h1 {
+        font-size: 18px;
+        }
+        .main-sidebar {
+        width: 0;
+        display: none;
+        }
+        .navbar-toggle {
+        color: #fff;
+        }
+        .content-wrapper {
+        font-size: 14px;
+        padding: 10px;
+        }
+        .tab-content .tab-pane img {
+        display: none;
+        }
+        .tab-content .tab.pane .column {
+        width: 100%;
+        }
+        .tab-content .tab-pane div {
+        padding: 1rem;
+        font-size: 13px;
+        }
+        }
+        
+        /* Laptops (min-width: 992px) */
+        @media screen and (min-width: 992px) {
+        /* adjust styles for laptop here */
+        .main-header h1 {
+        font-size: 21px;
+        }
+        .content-wrapper {
+        font-size: 14px;
+        }
+        }
+        
+        /* larger laptops (min-width: 1200px) */
+        @media screen and (min-width: 1200px) {
+        .main-header h1 {
+        font-size: 24px;
+        }
+        .content-wrapper {
+        font-size: 16px;
+        }
+        }
+        "
+      ))
+    ),
     
     #changing theme in flatly
     shinyDashboardThemes(
@@ -58,9 +114,39 @@ dashboardPage(
                                               di Purworejo terhadap pemilu 2024 dari sisi geospasial. Penasaran?"))
                                 )
                               ),
-                     tabPanel("About", h4("Proyek ini menjelaskan tentang...")),
-                     tabPanel("Panduan", h4("Pengguna dapat membaca panduan penggunaan website di sini")
-                     )
+                     tabPanel("About",
+                              fluidRow(
+                                column(width = 3,
+                                       tags$h2("Tentang Proyek Mapilu"),
+                                       tags$br(),
+                                       tags$p("Proyek ini dilatarbelakangi oleh adanya survei dari British Council yang menyatakan bahwa hanya 8% generasi muda Indonesia yang merasa aktif tertarik dan terlibat dengan politik, 32% merasa tidak tertarik dengan politik sama sekali, dan 60% sisanya memilih netral maka penulis tertarik untuk melihat bagaimana fenomena ini terjadi di Kabupaten Purworejo. Sebelum webGIS ini disusun, dilaksanakan survei langsung ke 11 SMA Negeri yang tersebar di 16 Kecamatan dengan menyebarkan kuesioner digital (google form) dan mendapat respon yang baik dari pihak sekolah maupun responden. Data-data yang dikumpulkan ini, kemudian disusun sedemikian rupa dalam bentuk webGIS yang mengintegrasikan data non-spasial dengan data spasial.")),
+                                column(width = 9,
+                                       box(
+                                         title = "Area Penelitian",
+                                         status = "primary",
+                                         width = 12,
+                                         leafletOutput("aoi", height = "600px")
+                                       ))
+                              ),
+                              fluidRow(
+                                box(
+                                  title = "Eksplore Lebih Jauh tentang Proyek Mapilu",
+                                  status = "primary",
+                                  background = "navy",
+                                  width = 12,
+                                  collapsible = F,
+                                  div(
+                                    style = "color: white; padding: 2rem; font-size: 15px",
+                                    "Bagi teman-teman yang ingin bertanya atau berdiskusi lebih lanjut tentang proyek ini, dapat menghubungi penulis di:",
+                                    tags$br(),
+                                    tags$a("rebelanatasha@gmail.com", href = "mailto:rebelanatasha@gmail.com", style = "color: #ffffcc;"),
+                                    tags$br(),
+                                    tags$a("Instagram: @natashatrbl", href = "https://www.instagram.com/natashatrbl/", style = "color: #ffffcc;"),
+                                    tags$br(),
+                                    tags$a("Linkedin: Maria Natasha", href = "https://www.linkedin.com/in/maria-natasha-mp/", style = "color: #ffffcc;"))
+                                )
+                              )
+                            )
                   )
               ),
       
@@ -173,9 +259,9 @@ dashboardPage(
                 mainPanel(
                   width = 9,
                   column(6,
-                         plotOutput("demografi_map")),
+                         plotlyOutput("demografi_map")),
                   column(6,
-                         plotOutput("tingkatpartisipasi_map"))
+                         plotlyOutput("tingkatpartisipasi_map"))
                 )
               )
       ),

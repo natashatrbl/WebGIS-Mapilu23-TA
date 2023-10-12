@@ -1,5 +1,47 @@
 
 function(input, output, session) {
+  ####################### MENU ABOUT ###################
+  blank_map <- leaflet(summarymap) %>%
+    setView(lng = 110.0093, lat = -7.7129, zoom = 11) %>%
+    addProviderTiles(provider = "CartoDB.Positron",
+                     options = providerTileOptions(noWrap = TRUE),
+                     group = "Light"
+    ) %>%
+    addProviderTiles(
+      provider = "OpenStreetMap.Mapnik",
+      options = providerTileOptions(noWrap = TRUE),
+      group = "Street"
+    ) %>%
+    addLayersControl(
+      baseGroups = c("Light", "Street"),
+      overlayGroups = c("Batas Administrasi", "Sekolah"),
+      options = layersControlOptions(collapsed = F),
+      position = "topleft"
+    ) %>%
+    addEasyButton(easyButton(
+      icon = "fa-crosshairs", 
+      title = "Locate Me",
+      onClick = JS("function(btn, map){ map.locate({setView: true}); }"))
+    )
+  output$aoi <- renderLeaflet({
+      blank_map %>%
+      addPolygons(
+        data = summarymap,
+        fillColor = "#41b6c4", fillOpacity = 0.7,
+        color = "white", opacity = 0.8, weight = 1,
+        highlightOptions = highlightOptions(color = "white", weight = 2, fillOpacity = 1, bringToFront = T),
+        label = ~paste("Kecamatan", kecamatan),
+        group = "Batas Administrasi"
+      ) %>%
+      addMarkers(
+        data = point_sma,
+        lng = ~long,
+        lat = ~lat,
+        popup = ~paste("<h6 style = 'color: #2c7fb8;'> Nama Sekolah: </h6>", point_sma$name, "<br>", "<h6 style = 'color: #2c7fb8;'> Alamat:</h6>", point_sma$address, "<br>", "<h6 style = 'color: #2c7fb8;'> Nomor Telepon:</6>", point_sma$phone),
+        group = "Sekolah"
+      )
+  })
+  
   
   ######################## MENU PETA MAPILU ###################################
   
@@ -321,7 +363,7 @@ function(input, output, session) {
     p <- ggplot(data = data_hasil)+
       geom_bar(aes(x = str_wrap(CAPRES, width = 5), fill = CAPRES), stat = "count")+
       scale_fill_manual(values = color_capres)+
-      guides(fill = F)+
+      guides(fill = "none")+
       theme_minimal()+
       theme(panel.grid = element_blank())+
       labs(title = "Jumlah Suara Capres Keseluruhan", x = "Nama Capres", y = "Jumlah Suara")
@@ -333,7 +375,7 @@ function(input, output, session) {
     p <- ggplot(data = data_hasil)+
       geom_bar(aes(x = str_wrap(PARTAI_LEGISLATIF, width = 7), fill = PARTAI_LEGISLATIF), stat = "count")+
       scale_fill_manual(values = color_legis)+
-      guides(fill = F)+
+      guides(fill = "none")+
       theme_minimal()+
       theme(panel.grid = element_blank())+
       labs(title = "Jumlah Suara Parpol Legislatif", x = "Nama Parpol", y = "Jumlah Suara")
@@ -473,88 +515,97 @@ function(input, output, session) {
   #plotting the geografi map using ggplot2
   if (input$demografi_map_option == "Populasi") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = POPULASI))+
-        scale_fill_gradient(low = "white", high = "#273811")+
+        scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Populasi di Kabupaten Purworejo Tahun 2022")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Kepadatan Penduduk") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = KPDTN_PEND))+
-        scale_fill_gradient(low = "white", high = "#273811")+
+        scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Kepadatan Penduduk Kabupaten Purworejo Tahun 2022")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Responden Laki-laki") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = RES_BOY))+
-        scale_fill_gradient(low = "white", high = "#273811")+
+        scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Responden Laki-laki")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Responden Perempuan") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = RES_GIRL))+
-        scale_fill_gradient(low = "white", high = "#273811")+
+        scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Responden Laki-laki")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Beragama Islam") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = ISLAM))+
-        scale_fill_gradient(low = "white", high = "#0B2838")+
+        scale_fill_gradient(low = "#bdc9e1", high = "#045a8d")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Penduduk Beragama Islam")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Beragama Non-Islam") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = NON_ISLAM))+
-        scale_fill_gradient(low = "white", high = "#0B2838")+
+        scale_fill_gradient(low = "#bdc9e1", high = "#045a8d")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Penduduk Beragama Non-Islam")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Jarak Kabupaten") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = JARAK_KAB))+
-        scale_fill_gradient(low = "white", high = "#F78104")+
+        scale_fill_gradient(low = "#f0f9e8", high = "#253494")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jarak ke Pusat Kabupaten Per Kecamatan")
+      ggplotly(p)
     })
   } else if (input$demografi_map_option == "Ketinggian Wilayah") {
     output$demografi_map <- renderPlotly({
-      ggplot()+
+      p <- ggplot()+
         geom_sf(data = demografi_pwr, aes(fill = TINGGI_MDP))+
-        scale_fill_gradient(low = "white", high = "#F78104")+
+        scale_fill_gradient(low = "#f0f9e8", high = "#253494")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Ketinggian Wilayah Per Kecamatan")
+      ggplotly(p)
     })
   }
     #plotting the tingkat partisipasi map using ggplot2
     output$tingkatpartisipasi_map <- renderPlotly({
-      ggplot() +
+      p <- ggplot() +
         geom_sf(data = partisipasi_pwr, aes(fill = SK_TOTAL))+
         scale_fill_gradient2(low = "#2FB380", mid = "white", high = "#3459E6", midpoint = 25,
-                             breaks = c(17, 25, 32),
+                             breaks = c(22, 24, 26),
                              labels = c("Kurang Partisipatif", "Cukup Partisipatif", "Sangat Partisipatif"),
-                             limits = c(17, 32))+
+                             limits = c(22, 26))+
         theme_minimal() +
         theme(panel.grid = element_blank()) +
         labs(title = "Skor Tingkat Partisipasi Kabupaten Purworejo")
+      ggplotly(p)
     })
 })
   
@@ -654,11 +705,11 @@ function(input, output, session) {
     #plotting the map
     output$presiden_map <- renderPlotly({
       p <- ggplot()+
-        geom_sf(data = elected_data, aes(fill = .data[[column_name]], text = paste("Kecamatan:", kecamatan)))+
+        geom_sf(data = elected_data, aes(fill = .data[[column_name]]))+
         scale_fill_gradient(name = selected_capres)+
         labs(fill = selected_capres)+
         theme_minimal()
-      ggplotly(p, tooltip = "text")
+      ggplotly(p)
     })
   })
     
@@ -715,7 +766,7 @@ function(input, output, session) {
                              "Perindo" = "PRD_PCTL",
                              "PAN" = "PAN_PCTL")
       
-    #creating ggplot list 
+      #creating ggplot list 
       gg_plots <- list()
       
       for (party in selected_parpol) {
@@ -724,8 +775,9 @@ function(input, output, session) {
         
         gg <- ggplot(electoral_pwr)+
           geom_sf(aes(fill = .data[[aes_name]]))+
-          scale_fill_gradient2(low = "orange", mid = "white", high = "red", name = legend_label)+
-          labs(title = legend_label)
+          scale_fill_gradient2(low = "#ffffb2", mid = "#fd8d3c", high = "#bd0026", name = legend_label)+
+          labs(title = legend_label)+
+          theme_void()
         
         gg_plots[[party]] <- gg
       }
@@ -746,6 +798,7 @@ function(input, output, session) {
       output$electoral_map <- NULL
     }
   })
+
 }
 
 
