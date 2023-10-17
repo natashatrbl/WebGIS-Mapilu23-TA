@@ -7,7 +7,7 @@ dashboardPage(
   dashboardHeader(
     #title
     title = "Mapilu Purworejo",
-    titleWidth = "95%",
+    titleWidth = "90%",
     #listing navbar
     tags$li(class="dropdown", tags$a(href="#home"))
   ),
@@ -35,15 +35,34 @@ dashboardPage(
     tags$head(
       tags$style(HTML(
         "
-        /* small phones (max-width 600px) */
-        @media screen and (max-width: 600px) {
-        /* adjust style for small phones */
+        /* universal css */
+        .circle {
+                    width: 15px;
+                    height: 15px;
+                    border-radius: 50%;
+                    background-color: red;
+                    display: inline-block;
+                    position: relative;
+                    margin-right: 5px;
+                    color: red;
+        }
+        .popup-text {
+          color: black;
+        }
+        
+                    
+        /* Media Queries */
+        /* small phones (max-width 576px) */
+        @media screen and (max-width: 576px) {
+        /* hide the sidebar on smartphone */
+        .dashboard-header .shiny-title {
+        width = 40%;
+        }
         .main-header h1 {
         font-size: 18px;
         }
-        .main-sidebar {
-        width: 0;
-        display: none;
+        .main-header h4{
+        font-size: 15px;
         }
         .navbar-toggle {
         color: #fff;
@@ -53,14 +72,14 @@ dashboardPage(
         padding: 10px;
         }
         .tab-content .tab-pane img {
-        display: none;
+        display: block;
         }
         .tab-content .tab.pane .column {
         width: 100%;
         }
         .tab-content .tab-pane div {
         padding: 1rem;
-        font-size: 13px;
+        font-size: 12px;
         }
         }
         
@@ -68,20 +87,35 @@ dashboardPage(
         @media screen and (min-width: 992px) {
         /* adjust styles for laptop here */
         .main-header h1 {
+        font-size: 28px;
+        }
+        .main-header h4 {
         font-size: 21px;
         }
-        .content-wrapper {
+        .main-header p {
         font-size: 14px;
+        }
+        .content-wrapper {
+        font-size: 13px;
+        }
+        .dashboard-header .shiny-title {
+        width = 70%;
         }
         }
         
         /* larger laptops (min-width: 1200px) */
         @media screen and (min-width: 1200px) {
         .main-header h1 {
+        font-size: 32px;
+        }
+        .main-header h4 {
         font-size: 24px;
         }
-        .content-wrapper {
+        .main-header p {
         font-size: 16px;
+        }
+        .content-wrapper {
+        font-size: 14px;
         }
         }
         "
@@ -104,7 +138,7 @@ dashboardPage(
                                        tags$img(src="politics.jpg", width = "100%", height = "100%"), 
                                        tags$br(), 
                                        tags$a("Photo by: Rafli Firmansyah on Unsplash", align = "center")),
-                                column(width = 8, 
+                                column(width = 6, 
                                        tags$h1("Selamat Datang di Mapilu Purworejo"),
                                        tags$h4("Mapping Analysis of Young Voters Behavior"),
                                        tags$br(),
@@ -178,7 +212,7 @@ dashboardPage(
                 ),
                   mainPanel(
                     width = 9,
-                    leafletOutput("map", height = "800px")
+                    leafletOutput("map", height = "800px"),
                   )
               ),
               ##### viewport kedua #####
