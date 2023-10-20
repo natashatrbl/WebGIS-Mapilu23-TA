@@ -29,7 +29,6 @@ electoral_csv <- read.csv("data/electoral_avg.csv")
 
 #data geojson
 electoralmap <- sf::st_read("data/electoralmap_geojson.geojson")
-electoralmap_fil <- sf::st_read("data/electoralmapfil_geojson.geojson")
 demografimap <- sf::st_read("data/demografimap_geojson.geojson")
 summarymap <- sf::st_read("data/summap_un-fil_geojson.geojson")
 
