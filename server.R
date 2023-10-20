@@ -144,7 +144,7 @@ function(input, output, session) {
       ) %>%
       addLegend(
         colors = c("#ffffcc", "#a1dab4", "#2c7fb8"),
-        labels = c("Rendah (10 - 17)", "Sedang (18 - 25)", "Tinggi (26 - 32)"),
+        labels = c("Rendah (10 - 16)", "Sedang (17 - 24)", "Tinggi (25 - 32)"),
         title = "Kelas Tingkat Partisipasi",
         position = "bottomright",
         group = "Tingkat Partisipasi Unfiltered"
@@ -165,7 +165,7 @@ function(input, output, session) {
       ) %>%
       addLegend(
         colors = c("#ffffcc", "#a1dab4", "#2c7fb8"),
-        labels = c("Rendah (10 - 17)", "Sedang (18 - 25)", "Tinggi (26 - 32)"),
+        labels = c("Rendah (10 - 16)", "Sedang (17 - 24)", "Tinggi (25 - 32)"),
         title = "Kelas Tingkat Partisipasi Filtered",
         position = "bottomright",
         group = "Tingkat Partisipasi Filtered"
@@ -224,7 +224,7 @@ function(input, output, session) {
         position = "bottomright",
         group = "Persentase Capres"
       ) %>%
-      hideGroup(c("Tingkat Partisipasi Filtered", "Tingkat Partisipasi Indikator", "Tingkat Partisipasi Unfiltered", "Demografi "))
+      hideGroup(c("Tingkat Partisipasi Filtered", "Tingkat Partisipasi Indikator", "Tingkat Partisipasi Unfiltered", "Demografi"))
   })
   
   ########## Sidebar Menu ##########
@@ -335,8 +335,6 @@ function(input, output, session) {
       labs(title = "Apakah Responden Masa Bodoh Terhadap Hasil Pemilu?", x = "Pendapat Tentang Hasil Pemilu", y = "Jumlah")
     ggplotly(p, tooltip = c("count"))
   })
-  
-  
   
   
   ######################## MENU DEMOGRAFI #################################
@@ -497,10 +495,10 @@ function(input, output, session) {
     #plotting the tingkat partisipasi map using ggplot2
     output$tingkatpartisipasi_map <- renderPlotly({
       p <- ggplot() +
-        geom_sf(data = participationmap, aes(fill = SK_TOTAL))+
+        geom_sf(data = summarymap, aes(fill = SK_TOT))+
         scale_fill_gradient2(low = "#2FB380", mid = "white", high = "#3459E6", midpoint = 25,
                              breaks = c(22, 24, 26),
-                             labels = c("Kurang Partisipatif", "Cukup Partisipatif", "Sangat Partisipatif"),
+                             labels = c("Rendah", "Sedang", "Tinggi"),
                              limits = c(22, 26))+
         theme_minimal() +
         theme(panel.grid = element_blank()) +
