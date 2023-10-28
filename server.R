@@ -22,7 +22,9 @@ function(input, output, session) {
       icon = "fa-crosshairs", 
       title = "Locate Me",
       onClick = JS("function(btn, map){ map.locate({setView: true}); }"))
-    )
+    ) %>%
+    addScaleBar(position = "bottomleft", scaleBarOptions(maxWidth = 200, metric = T, imperial = T, updateWhenIdle = T))
+  
   output$aoi <- renderLeaflet({
       blank_map %>%
       addPolygons(
@@ -98,7 +100,9 @@ function(input, output, session) {
       title = "Locate Me",
       position = "topleft",
       onClick = JS("function(btn, map){ map.locate({setView: true}); }"))
-    )
+    ) %>%
+    addScaleBar(position = "bottomleft",
+                scaleBarOptions(maxWidth = 200,metric = T, imperial = T, updateWhenIdle = T))
   
   ##### render leaflet ####
   output$map <- renderLeaflet({
@@ -412,88 +416,112 @@ function(input, output, session) {
   observeEvent(input$showmap_button, {
   #plotting the demografi map using ggplot2
   if (input$demografi_map_option == "Populasi") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = POPULASI))+
         scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Populasi di Kabupaten Purworejo Tahun 2022")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Kepadatan Penduduk") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = KPDTN_PEND))+
         scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Kepadatan Penduduk Kabupaten Purworejo Tahun 2022")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Responden Laki-laki") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = RES_BOY))+
         scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Responden Laki-laki")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Responden Perempuan") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlo({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = RES_GIRL))+
         scale_fill_gradient(low = "#ece2f0", high = "#1c9099")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Responden Laki-laki")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Beragama Islam") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = ISLAM))+
         scale_fill_gradient(low = "#bdc9e1", high = "#045a8d")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Penduduk Beragama Islam")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Beragama Non-Islam") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = NON_ISLAM))+
         scale_fill_gradient(low = "#bdc9e1", high = "#045a8d")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jumlah Penduduk Beragama Non-Islam")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Jarak Kabupaten") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = JARAK_KAB))+
         scale_fill_gradient(low = "#f0f9e8", high = "#253494")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Jarak ke Pusat Kabupaten Per Kecamatan")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   } else if (input$demografi_map_option == "Ketinggian Wilayah") {
-    output$demografi_map <- renderPlotly({
+    output$demografi_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = demografimap, aes(fill = TINGGI_MDP))+
         scale_fill_gradient(low = "#f0f9e8", high = "#253494")+
         theme_minimal()+
         theme(panel.grid = element_blank())+
         labs(title = "Ketinggian Wilayah Per Kecamatan")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   }
     #plotting the tingkat partisipasi map using ggplot2
-    output$tingkatpartisipasi_map <- renderPlotly({
+    output$tingkatpartisipasi_map <- renderPlot({
       p <- ggplot() +
         geom_sf(data = summarymap, aes(fill = SK_TOT))+
         scale_fill_gradient2(low = "#2FB380", mid = "white", high = "#3459E6", midpoint = 25,
@@ -503,7 +531,10 @@ function(input, output, session) {
         theme_minimal() +
         theme(panel.grid = element_blank()) +
         labs(title = "Skor Tingkat Partisipasi Kabupaten Purworejo")
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
 })
   
@@ -565,8 +596,6 @@ function(input, output, session) {
       theme_minimal()+
       theme(panel.grid = element_blank())+
       labs(title = paste("Dominasi Partai Politik Legislatif di", input$kecamatan_elect), x = "Partai Politik Legislatif", y = "Count")
-    
-    #Create plotly plot from ggplot object
     ggplotly(p, tooltip = c("count"))
   })
  
@@ -577,8 +606,6 @@ function(input, output, session) {
       theme_minimal()+
       theme(panel.grid = element_blank())+
       labs(title = paste("Dominasi Capres di", input$kecamatan_elect), x = "Nama Capres", y = "Count")
-    
-    #Create plotly plot from ggplot object
     ggplotly(p, tooltip = c("count"))
   })
   
@@ -601,13 +628,16 @@ function(input, output, session) {
     )
     
     #plotting the map
-    output$presiden_map <- renderPlotly({
+    output$presiden_map <- renderPlot({
       p <- ggplot()+
         geom_sf(data = elected_data, aes(fill = .data[[column_name]]))+
         scale_fill_gradient(name = selected_capres)+
         labs(fill = selected_capres)+
         theme_minimal()
-      ggplotly(p)
+      p <- p +
+        annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+        annotation_scale()
+      p
     })
   })
     
@@ -675,6 +705,9 @@ function(input, output, session) {
           scale_fill_gradient2(low = "#ffffb2", mid = "#fd8d3c", high = "#bd0026", name = legend_label)+
           labs(title = legend_label)+
           theme_void()
+        gg <- gg +
+          annotation_north_arrow(location = "tr", which_north = "true", pad_x = unit(0.02, "npc"), pad_y = unit(0.02, "npc"))+
+          annotation_scale()
         
         gg_plots[[party]] <- gg
       }

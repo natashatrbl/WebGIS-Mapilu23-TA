@@ -293,9 +293,9 @@ dashboardPage(
                 mainPanel(
                   width = 9,
                   column(6,
-                         plotlyOutput("demografi_map")),
+                         plotOutput("demografi_map")),
                   column(6,
-                         plotlyOutput("tingkatpartisipasi_map"))
+                         plotOutput("tingkatpartisipasi_map"))
                 )
               )
       ),
@@ -378,7 +378,7 @@ dashboardPage(
               mainPanel(
                   width = 9,
                     column(8,
-                          plotlyOutput("presiden_map")),
+                          plotOutput("presiden_map")),
                     column(4,
                            tableOutput("presiden_table"))
                 )
